@@ -1,6 +1,6 @@
-From 16ca13ad1eaa2833ce8784cf605dcf31ba808365 Mon Sep 17 00:00:00 2001
+From 809730fd477d192d066ff7c68932d85de8b37647 Mon Sep 17 00:00:00 2001
 From: Andrey Utkin <andrey_utkin@gentoo.org>
-Date: Tue, 11 Dec 2018 13:39:16 +0000
+Date: Tue, 11 Dec 2018 17:21:46 +0000
 Subject: [PATCH] Fix build with LibreSSL
 
 When using LibreSSL instead of Openss, linkage of hostapd executable
@@ -23,19 +23,21 @@ spice-gtk, pjsip.
 Link: https://bugs.gentoo.org/672834
 Signed-off-by: Andrey Utkin <andrey_utkin@gentoo.org>
 ---
- src/crypto/tls_openssl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/crypto/tls_openssl.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/crypto/tls_openssl.c b/src/crypto/tls_openssl.c
-index 0d5ebda69..7234045d7 100644
+index 0d5ebda69..c2b0dfaec 100644
 --- a/src/crypto/tls_openssl.c
 +++ b/src/crypto/tls_openssl.c
-@@ -104,7 +104,7 @@ static size_t SSL_SESSION_get_master_key(const SSL_SESSION *session,
+@@ -104,7 +104,9 @@ static size_t SSL_SESSION_get_master_key(const SSL_SESSION *session,
  
  #endif
  
 -#if OPENSSL_VERSION_NUMBER < 0x10100000L
-+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
++#if OPENSSL_VERSION_NUMBER < 0x10100000L || \
++	(defined(LIBRESSL_VERSION_NUMBER) && \
++	 LIBRESSL_VERSION_NUMBER < 0x20700000L)
  #ifdef CONFIG_SUITEB
  static int RSA_bits(const RSA *r)
  {
